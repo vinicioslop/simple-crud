@@ -5,18 +5,18 @@ using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace API.db
 {
-    public partial class simple_crudContext : DbContext
+    public partial class simplecrudContext : DbContext
     {
-        public simple_crudContext()
+        public simplecrudContext()
         {
         }
 
-        public simple_crudContext(DbContextOptions<simple_crudContext> options)
+        public simplecrudContext(DbContextOptions<simplecrudContext> options)
             : base(options)
         {
         }
 
-        public virtual DbSet<Usuario> Usuario { get; set; } = null!;
+        public virtual DbSet<TbUsuario> TbUsuario { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -28,16 +28,27 @@ namespace API.db
             modelBuilder.UseCollation("utf8mb4_general_ci")
                 .HasCharSet("utf8mb4");
 
-            modelBuilder.Entity<Usuario>(entity =>
+            modelBuilder.Entity<TbUsuario>(entity =>
             {
                 entity.HasKey(e => e.IdUsuario)
                     .HasName("PRIMARY");
 
-                entity.ToTable("usuario");
+                entity.ToTable("tb_usuario");
+
+                entity.HasIndex(e => e.Login, "login")
+                    .IsUnique();
 
                 entity.Property(e => e.IdUsuario)
                     .HasColumnType("int(11)")
                     .HasColumnName("id_usuario");
+
+                entity.Property(e => e.Login)
+                    .HasMaxLength(20)
+                    .HasColumnName("login");
+
+                entity.Property(e => e.NmEmail)
+                    .HasMaxLength(60)
+                    .HasColumnName("nm_email");
 
                 entity.Property(e => e.NmUsuario)
                     .HasMaxLength(80)
@@ -51,6 +62,11 @@ namespace API.db
                 entity.Property(e => e.NrTelefone)
                     .HasMaxLength(11)
                     .HasColumnName("nr_telefone")
+                    .IsFixedLength();
+
+                entity.Property(e => e.Senha)
+                    .HasMaxLength(64)
+                    .HasColumnName("senha")
                     .IsFixedLength();
             });
 

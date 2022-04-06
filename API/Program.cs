@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddDbContext<simple_crudContext>(opt =>
+builder.Services.AddDbContext<simplecrudContext>(opt =>
 {
     string connectionString = builder.Configuration.GetConnectionString("tarefasConnection");
     var serverVersion = ServerVersion.AutoDetect(connectionString);
@@ -20,36 +20,36 @@ app.UseHttpsRedirection();
 app.UseSwagger();
 app.UseSwaggerUI();
 
-app.MapGet("api/simple_crud", (
-    [FromServices] simple_crudContext _db,
+app.MapGet("/simple-crud/usuarios", (
+    [FromServices] simplecrudContext _db,
     [FromQuery] string? nome
 ) => {
-    var query = _db.Usuario.AsQueryable<Usuario>();
+    var query = _db.TbUsuario.AsQueryable<TbUsuario>();
 
     if (!String.IsNullOrEmpty(nome))
     {
         query = query.Where(u => u.NmUsuario.Contains(nome));
     }
 
-    var usuarios = query.ToList<Usuario>();
+    var usuarios = query.ToList<TbUsuario>();
 
     return Results.Ok(usuarios);
 });
 
-app.MapGet("/api/simple_crud/{id}", (
-    [FromServices] simple_crudContext _db,
+app.MapGet("/simple-crud/usuarios/{id}", (
+    [FromServices] simplecrudContext _db,
     [FromRoute] int id
 ) => {
-    var usuario = _db.Usuario.Find(id);
+    var usuario = _db.TbUsuario.Find(id);
 
     if (usuario == null) return Results.NotFound();
 
     return Results.Ok(usuario);
 });
 
-app.MapPost("/api/usuarios", (
-    [FromServices] simple_crudContext _db,
-    [FromBody] Usuario novoUsuario
+app.MapPost("/simple-crud/usuarios", (
+    [FromServices] simplecrudContext _db,
+    [FromBody] TbUsuario novoUsuario
 ) => {
     if (String.IsNullOrEmpty(novoUsuario.NmUsuario) ||
         String.IsNullOrEmpty(novoUsuario.NrCpf) ||
@@ -60,14 +60,14 @@ app.MapPost("/api/usuarios", (
         });
     }
 
-    var usuario = new Usuario
+    var usuario = new TbUsuario
     {
         NmUsuario = novoUsuario.NmUsuario,
         NrCpf = novoUsuario.NrCpf,
         NrTelefone = novoUsuario.NrTelefone
     };
 
-    _db.Usuario.Add(usuario);
+    _db.TbUsuario.Add(usuario);
     _db.SaveChanges();
 
     var usuarioUrl = $"/api/usuario/{usuario.IdUsuario}";
@@ -75,10 +75,10 @@ app.MapPost("/api/usuarios", (
     return Results.Created(usuarioUrl, usuario);
 });
 
-app.MapPut("/api/usuarios/{id}", (
-    [FromServices] simple_crudContext _db,
+app.MapPut("/simple-crud/usuarios/{id}", (
+    [FromServices] simplecrudContext _db,
     [FromRoute] int id,
-    [FromBody] Usuario usuarioAlterado
+    [FromBody] TbUsuario usuarioAlterado
 ) => {
     if (usuarioAlterado.IdUsuario != id)
     {
@@ -92,7 +92,7 @@ app.MapPut("/api/usuarios/{id}", (
         return Results.BadRequest(new { mensagem = "Não é possível atualizar um novo usuário com dados faltantes." });
     }
 
-    var usuario = _db.Usuario.Find(id);
+    var usuario = _db.TbUsuario.Find(id);
 
     if (usuario == null)
     {
@@ -108,18 +108,18 @@ app.MapPut("/api/usuarios/{id}", (
     return Results.Ok(usuario);
 });
 
-app.MapDelete("/api/usuarios/{id}", (
-    [FromServices] simple_crudContext _db,
+app.MapDelete("/simple-crud/usuarios/{id}", (
+    [FromServices] simplecrudContext _db,
     [FromRoute] int id
 ) => {
-    var usuario = _db.Usuario.Find(id);
+    var usuario = _db.TbUsuario.Find(id);
 
     if (usuario == null)
     {
         return Results.NotFound();
     }
 
-    _db.Usuario.Remove(usuario);
+    _db.TbUsuario.Remove(usuario);
     _db.SaveChanges();
 
     return Results.Ok();
